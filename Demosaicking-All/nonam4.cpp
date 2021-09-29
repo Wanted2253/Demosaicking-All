@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
@@ -6,56 +7,211 @@
 #include "guidedfilter.h"
 using namespace std;
 using namespace cv;
-void weightgenerator(int ***arr) {
-	return;
-}
-Mat method1_h(Mat Src1ch) {
-	Mat result = Mat::zeros(Src1ch.rows, Src1ch.cols, CV_32F);
-	int colend = (Src1ch.cols / 3) - 1;
-	int x = 18;
-	int y = 3;
-	int z = 3;
-	int*** arr = new int** [x];
-	for (int i = 0; i < x; i++) {
-		arr[i] = new int* [y];
-		for (int j = 0; j < y; j++) {
-			arr[i][j] = new int[z];
+void distance_generator(vector<vector<double>> &distance,bool horizontalflag){
+	int rowk,colk;
+	int rowk2,colk2;
+	int sum;
+	for(int i=0;i<distance.size();i++){
+		colk = i % 3;
+		rowk = i / 3;
+		sum = 0;
+		for(int j=0;j<9;j++){
+			colk2 = j % 3;
+			rowk2 = j / 3;
+			if(horizontalflag){
+				if(colk2<=colk){
+					sum = abs(colk2-colk) + abs(rowk2-rowk) + 3;
+				}
+				else{
+					sum = 3 - abs(colk2-colk) + abs(rowk2-rowk);
+				} 
+			}
+			else{
+				sum = abs(colk2-colk) + abs(rowk2-rowk);
+				if(rowk2<=rowk){
+					sum = abs(colk2-colk) + abs(rowk2-rowk) + 3;
+				}
+				else{
+					sum = 3 - abs(rowk2-rowk) + abs(colk2-colk);
+				}
+			}
+			distance[i][j] = sum;
+		}
+		for(int j=9;j<18;j++){
+			colk2 = (j-9) % 3;
+			rowk2 = (j-9) / 3;
+			if(horizontalflag){
+				if(colk2>=colk){
+					sum = abs(colk2-colk) + abs(rowk2-rowk) + 3;
+				}
+				else{
+					sum = 3 - abs(colk2-colk) + abs(rowk2-rowk);
+				} 
+			}
+			else{
+				sum = abs(colk2-colk) + abs(rowk2-rowk);
+				if(rowk2>=rowk){
+					sum = abs(colk2-colk) + abs(rowk2-rowk) + 3;
+				}
+				else{
+					sum = 3 - abs(rowk2-rowk) + abs(colk2-colk);
+				}
+			}
+			distance[i][j] = sum;
 		}
 	}
-	weightgenerator(arr);
+}
+void weight_generator(vector<vector<double>> &weights, vector<vector<double>> &distance, double k ) {
+	double sum = 0;
+	double factor = 1;
+	for(int i=0;i<weights.size();i++){
+		sum = 0;
+		for(int j=0;j<weights[0].size();j++){
+			sum += pow(distance[i][j],k);
+		}
+		factor = 1.00/sum;
+		for(int j=0;j<weights[0].size();j++){
+			weights[i][j] = factor*pow(distance[i][j],k);
+		}
+	}
+	return;
+}
+Mat method4_h(Mat Src1ch, float k) {
+	Mat result = Mat::zeros(Src1ch.rows, Src1ch.cols, CV_32F);
+	int colend = (Src1ch.cols / 3) - 1;
+	int rowk;
+	int colk;
+	int left_startrow,left_startcol,right_startrow,right_startcol;
+	int l,r,w;
+	vector<vector<double>> weights_h( 9 , vector<double> (18, 0));
+	vector<vector<double>> dist_h( 9 , vector<double> (18, 0));
+	distance_generator(dist_h,1);
+	weight_generator(weights_h,dist_h,k);
 	for (int row = 0; row < result.rows; row++) {
 		for (int col = 0; col < 3; col++) {
-			result.at<uchar>(row, col) = Src1ch.at<uchar>(row, col + (3 - (col % 3)));
+			rowk = row % 3;
+			colk = col % 3;
+			left_startrow = row  - rowk;
+			left_startcol = col + 3 - colk;
+			right_startrow = row - rowk;
+			right_startcol = col + 3 - colk;
+			l = 0;
+			r = 9;
+			w = (rowk * 3)  + colk;
+			for(int i = 0;i < 3;i++){
+				for(int j = 0; j< 3;j++){
+					result.at<uchar>(row, col) += ((Src1ch.at<uchar>(left_startrow + i, left_startcol + j)))*(weights_h[w][l++]));
+					result.at<uchar>(row, col) += ((Src1ch.at<uchar>(right_startrow + i, right_startcol + j)))*(weights_h[w][r++]));
+				}
+			}
 		}
 	}
 	for (int row = 0; row < result.rows; row++) {
 		for (int col = result.cols - 1; col > result.cols - 4; col--) {
-			result.at<uchar>(row, col) = Src1ch.at<uchar>(row, col - 1 - (col % 3));
+			rowk = row % 3;
+			colk = col % 3;
+			left_startrow = row  - rowk;
+			left_startcol = col - 3 - colk;
+			right_startrow = row - rowk;
+			right_startcol = col - 3 - colk;
+			l = 0;
+			r = 9;
+			w = (rowk * 3)  + colk;
+			for(int i = 0;i < 3;i++){
+				for(int j = 0; j< 3;j++){
+					result.at<uchar>(row, col) += ((Src1ch.at<uchar>(left_startrow + i, left_startcol + j)))*(weights_h[w][l++]));
+					result.at<uchar>(row, col) += ((Src1ch.at<uchar>(right_startrow + i, right_startcol + j)))*(weights_h[w][r++]));
+				}
+			}
 		}
 	}
 	for (int row = 0; row < result.rows; row++) {
 		for (int col = 3; col < result.cols - 3; col++) {
-			result.at<uchar>(row, col) = ((Src1ch.at<uchar>(row, col + 3)) * 0.5) + ((Src1ch.at<uchar>(row, col - 3)) * 0.5);
+			rowk = row % 3;
+			colk = col % 3;
+			left_startrow = row - rowk;
+			left_startcol = col - 3 - colk;
+			right_startrow = row - rowk;
+			right_startcol = col + 3 - colk;
+			l = 0;
+			r = 9;
+			w = (rowk * 3)  + colk;
+			for(int i = 0;i < 3;i++){
+				for(int j = 0; j< 3;j++){
+					result.at<uchar>(row, col) += ((Src1ch.at<uchar>(left_startrow + i, left_startcol + j)))*(weights_h[w][l++]));
+					result.at<uchar>(row, col) += ((Src1ch.at<uchar>(right_startrow + i, right_startcol + j)))*(weights_h[w][r++]));
+				}
+			}
 		}
 	}
 	return result;
 }
-Mat method1_v(Mat Src1ch) {
+Mat method4_v(Mat Src1ch, float k) {
 	Mat result = Mat::zeros(Src1ch.rows, Src1ch.cols, CV_32F);
 	int rowend = (Src1ch.rows / 3) - 1;
+	int rowk;
+	int colk;
+	int left_startrow,left_startcol,right_startrow,right_startcol;
+	int l,r,w;
+	vector<vector<double>> weights_v( 9 , vector<int> (18, 0));
+	distancegenerator(dist_h,0);
+	vector<vector<double>> dist_v( 9 , vector<int> (18, 0));
+	weightgenerator(weights_v,dist_v,k);
 	for (int col = 0; col < result.cols; col++) {
 		for (int row = 0; row < 3; row++) {
-			result.at<uchar>(row, col) = Src1ch.at<uchar>(row + (3 - (row % 3)), col);
+			rowk = row % 3;
+			colk = col % 3;
+			top_startrow = row + 3 - rowk;
+			top_startcol = col - colk;
+			bottom_startrow = row + 3 - rowk;
+			bottom_startcol = col - colk;
+			l = 0;
+			r = 9;
+			w = (rowk * 3)  + colk;
+			for(int i = 0;i < 3;i++){
+				for(int j = 0; j< 3;j++){
+					result.at<uchar>(row, col) += ((Src1ch.at<uchar>(left_startrow + i, left_startcol + j)))*(weights_v[w][l++]));
+					result.at<uchar>(row, col) += ((Src1ch.at<uchar>(right_startrow + i, right_startcol + j)))*(weights_v[w][r++]));
+				}
+			}
 		}
 	}
 	for (int col = 0; col < result.cols; col++) {
 		for (int row = result.rows - 1; row > result.rows - 4; row--) {
-			result.at<uchar>(row, col) = Src1ch.at<uchar>(row - 1 - (row % 3), col);
+			rowk = row % 3;
+			colk = col % 3;
+			top_startrow = row - 3 - rowk;
+			top_startcol = col - colk;
+			bottom_startrow = row - 3 - rowk;
+			bottom_startcol = col - colk;
+			l = 0;
+			r = 9;
+			w = (rowk * 3)  + colk;
+			for(int i = 0;i < 3;i++){
+				for(int j = 0; j< 3;j++){
+					result.at<uchar>(row, col) += ((Src1ch.at<uchar>(left_startrow + i, left_startcol + j)))*(weights_v[w][l++]));
+					result.at<uchar>(row, col) += ((Src1ch.at<uchar>(right_startrow + i, right_startcol + j)))*(weights_v[w][r++]));
+				}
+			}
 		}
 	}
 	for (int row = 3; row < result.rows - 3; row++) {
 		for (int col = 0; col < result.cols; col++) {
-			result.at<uchar>(row, col) = ((Src1ch.at<uchar>(row + 3, col)) * 0.5) + ((Src1ch.at<uchar>(row - 3, col)) * 0.5);
+			rowk = row % 3;
+			colk = col % 3;
+			top_startrow = row - 3 - rowk;
+			top_startcol = col - colk;
+			bottom_startrow = row + 3 - rowk;
+			bottom_startcol = col - colk;
+			l = 0;
+			r = 9;
+			w = (rowk * 3)  + colk;
+			for(int i = 0;i < 3;i++){
+				for(int j = 0; j< 3;j++){
+					result.at<uchar>(row, col) += ((Src1ch.at<uchar>(left_startrow + i, left_startcol + j)))*(weights_v[w][l++]));
+					result.at<uchar>(row, col) += ((Src1ch.at<uchar>(right_startrow + i, right_startcol + j)))*(weights_v[w][r++]));
+				}
+			}
 		}
 	}
 	return result;
@@ -114,7 +270,7 @@ void bayer_masknona(cv::Mat& Bayer, cv::Mat& Dst) {
 	bayer_splitnona(temp, Dst);// or split(Bayer, temp)
 }
 
-void demosaic_nona(cv::Mat& Bayer, cv::Mat& Dst, float sigma = 1.0) {
+void demosaic_nona(cv::Mat& Bayer, cv::Mat& Dst, float sigma = 1.0, float k = 1.0) {
 	cv::Mat Src = Bayer.clone();
 	if (Bayer.channels() == 1) { //input 1 channel -> 3 channel Bayer
 		bayer_splitnona(Bayer, Src); // or split(Bayer, Src);
@@ -166,8 +322,8 @@ void demosaic_nona(cv::Mat& Bayer, cv::Mat& Dst, float sigma = 1.0) {
 	float VHkernel[3] = { 0.5, 0, 0.5 }; //bilinear interpolation at 1D
 	cv::Mat HK(1, 3, CV_32F, VHkernel);
 	cv::Mat VK(3, 1, CV_32F, VHkernel);
-	Mat rawH = method1_h(Src1ch);
-	Mat rawV = method1_v(Src1ch);
+	Mat rawH = method4_h(Src1ch,k);
+	Mat rawV = method4_v(Src1ch,k);
 
 
 	// Creating guide images
@@ -213,14 +369,14 @@ void demosaic_nona(cv::Mat& Bayer, cv::Mat& Dst, float sigma = 1.0) {
 	Mat residualB_V = (bgr[0] - tentativeB_V).mul(mask[0]);
 
 	// Residual interpolation
-	residualGr_H = method1_h(residualGr_H);
-	residualGb_H = method1_h(residualGb_H);
-	residualR_H = method1_h(residualR_H);
-	residualB_H = method1_h(residualB_H);
-	residualGr_V = method1_v(residualGr_V);
-	residualGb_V = method1_v(residualGb_V);
-	residualR_V = method1_v(residualR_V);
-	residualB_V = method1_v(residualB_V);
+	residualGr_H = method4_h(residualGr_H,k);
+	residualGb_H = method4_h(residualGb_H,k);
+	residualR_H = method4_h(residualR_H,k);
+	residualB_H = method4_h(residualB_H,k);
+	residualGr_V = method4_v(residualGr_V,k);
+	residualGb_V = method4_v(residualGb_V,k);
+	residualR_V = method4_v(residualR_V,k);
+	residualB_V = method_v(residualB_V,k);
 
 
 	// Add tentative image
