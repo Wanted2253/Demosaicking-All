@@ -6,6 +6,47 @@
 #include "guidedfilter.h"
 using namespace std;
 using namespace cv;
+Mat method1_h(Mat Src1ch){
+    Mat result = Mat::zeros(Src1ch.rows, Src1ch.cols, CV_32F);
+    int colend = (Src1ch.cols/3)-1;
+	for (int row = 0; row < result.rows; row++) {
+		for (int col = 0; col < 3; col++) {
+			result.at<uchar>(row, col) = Src1ch.at<uchar>(row, col + (3 - (col % 3)));
+		}
+	}
+	for (int row = 0; row < result.rows; row++) {
+		for (int col = result.cols - 1; col > result.cols - 4; col--) {
+			result.at<uchar>(row, col) = Src1ch.at<uchar>(row, col - 1 - (col % 3));
+		}
+	}
+	for (int row = 0; row < result.rows; row++) {
+		for (int col = 3; col < result.cols - 3; col++) {
+            result.at<uchar>(row, col) = ((Src1ch.at<uchar>(row, col+3))*0.5)+((Src1ch.at<uchar>(row, col-3))*0.5);
+        }
+    }
+    return result;
+}
+Mat method1_v(Mat Src1ch){
+    Mat result = Mat::zeros(Src1ch.rows, Src1ch.cols, CV_32F);
+    int rowend = (Src1ch.rows/3)-1;
+	for (int col = 0; col < result.cols; col++) {
+		for (int row = 0; row < 3; row++) {
+			result.at<uchar>(row, col) = Src1ch.at<uchar>(row + (3 - (row % 3)), col);
+		}
+	}
+	for (int col = 0; col < result.cols; col++) {
+		for (int row = result.rows - 1; row > result.rows - 4; row--) {
+			result.at<uchar>(row, col) = Src1ch.at<uchar>(row - 1 - (row % 3), col);
+		}
+	}
+	for (int row = 3; row < result.rows - 3; row++) {
+		for (int col = 0; col < result.cols; col++) {
+            result.at<uchar>(row, col) = ((Src1ch.at<uchar>(row+3, col))*0.5)+((Src1ch.at<uchar>(row-3, col))*0.5);
+        }
+    }
+    return result;
+}
+
 void toSingleChannelnona(cv::Mat& src, cv::Mat& dst) {
 	if (src.channels() != 3) {
 		std::cerr << "to_SingleChannel need 3 channel image" << std::endl;
@@ -13,8 +54,8 @@ void toSingleChannelnona(cv::Mat& src, cv::Mat& dst) {
 	}
 	dst = cv::Mat::zeros(src.rows, src.cols, CV_8UC1);
 	int channelNum;
-	for(int row = 0; row < src.rows; row++){
-		for(int col = 0; col < src.cols; col++){
+	for (int row = 0; row < src.rows; row++) {
+		for (int col = 0; col < src.cols; col++) {
 			int rowk = row / 3;
 			int colk = col / 3;
 			if (rowk % 2 == 0) { // opencv: BGR
@@ -111,9 +152,9 @@ void demosaic_nona(cv::Mat& Bayer, cv::Mat& Dst, float sigma = 1.0) {
 	float VHkernel[3] = { 0.5, 0, 0.5 }; //bilinear interpolation at 1D
 	cv::Mat HK(1, 3, CV_32F, VHkernel);
 	cv::Mat VK(3, 1, CV_32F, VHkernel);
-	Mat rawH, rawV;
-	filter2D(Src1ch, rawH, -1, HK); //original matlab uses'replicate' for all filter
-	filter2D(Src1ch, rawV, -1, VK);
+	Mat rawH = method1_h(Src1ch);
+    Mat rawV = method1_v(Src1ch);
+
 
 	// Creating guide images
 	Mat GuideG_H = bgr[1] + rawH.mul(mask[2]) + rawH.mul(mask[0]);
@@ -158,15 +199,15 @@ void demosaic_nona(cv::Mat& Bayer, cv::Mat& Dst, float sigma = 1.0) {
 	Mat residualB_V = (bgr[0] - tentativeB_V).mul(mask[0]);
 
 	// Residual interpolation
-	filter2D(residualGr_H, residualGr_H, -1, HK); //original matlab using 'replicate'
-	filter2D(residualGb_H, residualGb_H, -1, HK);
-	filter2D(residualR_H, residualR_H, -1, HK);
-	filter2D(residualB_H, residualB_H, -1, HK);
-	// verical part
-	filter2D(residualGr_V, residualGr_V, -1, VK);
-	filter2D(residualGb_V, residualGb_V, -1, VK);
-	filter2D(residualR_V, residualR_V, -1, VK);
-	filter2D(residualB_V, residualB_V, -1, VK);
+    residualGr_H = method1_h(residualGr_H);
+    residualGb_H = method1_h(residualGb_H);
+    residualR_H = method1_h(residualR_H);
+    residualB_H = method1_h(residualB_H);
+    residualGr_V = method1_v(residualGr_V);
+    residualGb_V = method1_v(residualGb_V);
+    residualR_V = method1_v(residualR_V);
+    residualB_V = method1_v(residualB_V);
+
 
 	// Add tentative image
 	Mat Gr_H = (tentativeGr_H + residualGr_H).mul(mask[2]);

@@ -36,6 +36,21 @@
     <ClCompile Include="gbtf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="nona.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nonam1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nonam2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nonam3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nonam4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="tipri.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -43,9 +58,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ari.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="nona.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

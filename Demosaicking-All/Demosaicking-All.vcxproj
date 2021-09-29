@@ -151,6 +151,10 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mlri.cpp" />
     <ClCompile Include="nona.cpp" />
+    <ClCompile Include="nonam1.cpp" />
+    <ClCompile Include="nonam2.cpp" />
+    <ClCompile Include="nonam3.cpp" />
+    <ClCompile Include="nonam4.cpp" />
     <ClCompile Include="ri.cpp" />
     <ClCompile Include="tipri.cpp" />
   </ItemGroup>
