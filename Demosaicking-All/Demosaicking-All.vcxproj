@@ -145,9 +145,13 @@
     <ClCompile Include="ari.cpp" />
     <ClCompile Include="demosaic.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TIPRI\guidedfiltertipri.cpp" />
+    <ClCompile Include="TIPRI\tipri.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="demosaic.h" />
+    <ClInclude Include="TIPRI\guidedfiltertipri.h" />
+    <ClInclude Include="TIPRI\tipri.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="bayer_pattern_img.bmp" />

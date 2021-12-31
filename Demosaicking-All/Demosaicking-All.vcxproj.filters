@@ -24,9 +24,21 @@
     <ClCompile Include="ari.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TIPRI\guidedfiltertipri.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TIPRI\tipri.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="demosaic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TIPRI\guidedfiltertipri.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TIPRI\tipri.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
