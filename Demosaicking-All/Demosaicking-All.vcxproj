@@ -144,29 +144,10 @@
   <ItemGroup>
     <ClCompile Include="ari.cpp" />
     <ClCompile Include="demosaic.cpp" />
-    <ClCompile Include="gbtf.cpp" />
-    <ClCompile Include="guidedfilter.cpp" />
-    <ClCompile Include="guidedfiltermlri.cpp" />
-    <ClCompile Include="guidedfiltertipri.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="mlri.cpp" />
-    <ClCompile Include="nona.cpp" />
-    <ClCompile Include="nonam1.cpp" />
-    <ClCompile Include="nonam2.cpp" />
-    <ClCompile Include="nonam3.cpp" />
-    <ClCompile Include="nonam4.cpp" />
-    <ClCompile Include="ri.cpp" />
-    <ClCompile Include="tipri.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="demosaic.h" />
-    <ClInclude Include="gbtf.h" />
-    <ClInclude Include="guidedfilter.h" />
-    <ClInclude Include="guidedfiltermlri.h" />
-    <ClInclude Include="guidedfiltertipri.h" />
-    <ClInclude Include="mlri.h" />
-    <ClInclude Include="ri.h" />
-    <ClInclude Include="tipri.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="bayer_pattern_img.bmp" />
