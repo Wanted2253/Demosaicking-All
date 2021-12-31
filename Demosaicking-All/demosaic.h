@@ -4,10 +4,10 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
-#include "ri.h"
-#include "gbtf.h"
-#include "mlri.h"
-#include "tipri.h"
+#include "RI/ri.h"
+#include "GBTF/gbtf.h"
+#include "MLRI/mlri.h"
+#include "TIPRI/tipri.h"
 //#include "ari.h"
 using namespace std;
 using namespace cv;

@@ -21,9 +21,6 @@
     <ClCompile Include="demosaic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ari.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TIPRI\guidedfiltertipri.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

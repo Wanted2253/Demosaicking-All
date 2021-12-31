@@ -3,8 +3,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
-#include "guidedfiltermlri.h"
-#include "guidedfilter.h"
+#include "RI/guidedfilter.h"
 using namespace std;
 using namespace cv;
 void toSingleChannelari(cv::Mat& src, cv::Mat& dst) {

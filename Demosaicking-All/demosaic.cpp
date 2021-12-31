@@ -56,7 +56,7 @@ void Demosaic(cv::Mat& img, cv::Mat& Dst, int BayerPatternFlag,int methodflag) {
 		demosaic_mlri(BayerImage, Dst);
 		break;
 	case 4: //MLRI + Weightage
-		//demosaic_tipri(BayerImage, Dst);
+		demosaic_tipri(BayerImage, Dst);
 		break;
 	//case 5: //ARI
 	//	demosaic_ari(BayerImage, Dst);

@@ -142,7 +142,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ari.cpp" />
     <ClCompile Include="demosaic.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TIPRI\guidedfiltertipri.cpp" />
